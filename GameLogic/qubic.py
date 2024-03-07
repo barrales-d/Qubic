@@ -4,8 +4,8 @@
 
 import numpy as np
 
-from GameLogic.game import Game
-from GameLogic.board import Board
+from .game import Game
+from .board import Board
 import itertools
 
 

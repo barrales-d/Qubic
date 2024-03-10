@@ -28,7 +28,7 @@ Qubic is a 3D tic-tac-toe variant in which two players take turns to place piece
 # Programming Language
 I will use Python as the primary programming language to implement the AI agent. Python offers various libraries that have been created and tested. Some libraries I am considering are PyTorch and OpenAI's Gym toolkit. For the GUI I want to implement, I will be using Pygame.
 # Starting Code and Extensions
-I have found a GitHub repository that contains the code necessary to implement the entire game loop for Qubic in the terminal; Sasidharan Mahalingam created this repository here: https://github.com/sasidharan-m/qubic-solver/tree/master. This repository also contains code for implementing different AI agents, but I only copied the code necessary for the base game loop. The extensions I will add to this starter code are my implementations of AI agents and a GUI that will take the existing game from the terminal into an actual game window display. 
+I have found a GitHub repository that contains the code necessary to implement the entire game loop for Qubic in the terminal; Sasidharan Mahalingam created this repository here: _https://github.com/sasidharan-m/qubic-solver/tree/master_. This repository also contains code for implementing different AI agents, but I only copied the code necessary for the base game loop. The extensions I will add to this starter code are my implementations of AI agents and a GUI that will take the existing game from the terminal into an actual game window display. 
 
 # Algorithm and Appoarch
 From my research, I will need to create a game tree and perform either a minimax search algorithm or an alpha-beta pruning algorithm. In addition, the game tree for a single state could grow reasonably large. Therefore, I think I should implement these algorithms with maximum depth in mind. 
@@ -38,3 +38,9 @@ I have copied the starting code enough to get a working Qubic game with two huma
 
 # Roles and Responsibilities
 I am working alone on this project and have no experience with AI, but the resources I have been given will help me implement this AI agent quickly. I can use the starter code GitHub as a resource to ensure I am on the right track. Finally, I have taken a CPSC 386 game design course and have the experience needed with Pygame to implement the GUI. 
+
+# Resoures
+## THE IMPORTANCE OF FORCING AND TREE SEARCH IN QUBIC 
+By: Sherman P. Butler, Robert G. Schlee 
+
+link: _https://dl.acm.org/doi/pdf/10.1145/503561.503578_

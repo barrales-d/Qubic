@@ -43,4 +43,4 @@ I am working alone on this project and have no experience with AI, but the resou
 ## THE IMPORTANCE OF FORCING AND TREE SEARCH IN QUBIC 
 By: Sherman P. Butler, Robert G. Schlee 
 
-link: _https://dl.acm.org/doi/pdf/10.1145/503561.503578_
+link:  https://dl.acm.org/doi/pdf/10.1145/503561.503578

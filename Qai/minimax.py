@@ -15,7 +15,7 @@ class MiniMaxPlayer(Player):
 
     def draw(self, screen, render_area, board):
         pygame.draw.rect(screen, DARK_GREY, render_area)
-        text_surface = self.font.render("Ai is performing MiniMax Algorithm...", True, WHITE)
+        text_surface = self.font.render("AI is runnnig MiniMax...", True, WHITE)
         pos = (render_area[2] // 2, render_area[3] // 2 + render_area[1])
         text_rect = text_surface.get_rect(center = pos)
         screen.blit(text_surface, text_rect)

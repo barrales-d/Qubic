@@ -6,7 +6,9 @@ RED = (160, 0, 0)
 BLUE = (0, 0, 160)
 LIGHT_BLUE = (160, 160, 255)
 
+AI_BLUE = (56, 81, 119)
 
-FPS = 60
+
+FPS = 30
 WIDTH = 640
 HEIGHT = 480

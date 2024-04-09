@@ -5,18 +5,16 @@ from GUI.buttons import *
 
 from Qai.player import Player
 
-class MiniMaxPlayer(Player):
+class AlphaBetaPlayer(Player):
     def __init__(self, game, max_depth=10):
         super().__init__(game)
         self.move = -inf
         self.max_depth = max_depth
-
-        self.font = pygame.font.Font(pygame.font.get_default_font(), 16)
+        self.font = pygame.font.Font(pygame.font.get_default_font(), 28)
 
     def draw(self, screen, render_area, board):
         pygame.draw.rect(screen, AI_BLUE, render_area)
-        # TODO: blit ai_bot png image in corner of screen!
-        # TODO: draw a pixel ai_bot to use over the temp image 
+        
         for rack in range(4):
             for row in range(4):
                 for col in range(4):
@@ -31,10 +29,10 @@ class MiniMaxPlayer(Player):
                     createSquareButton(screen, pos_x, render_area[1] + pos_y, BTN_SIZE, BTN_SIZE, disabled=True, disabled_color=color)
     
     def play(self, board) -> int | None:
-        self.minimax(board, True)
+        self.minimax(board, True, 0, -inf, inf)
         return self.move
 
-    def score(self, board, max_turn, depth):
+    def score(self, board, max_turn, depth) -> int:
         player = -1 if max_turn else 1
 
         win_state = self.game.getGameEnded(board, player)
@@ -45,14 +43,13 @@ class MiniMaxPlayer(Player):
         else:
             return 0
     
-    def eval_board(self, board, max_turn):
-        # TODO: create better eval function to maybe block the opposing player
+    def eval_board(self, board, max_turn) -> int:
         num1 = randint(-10, 10)
         num2 = randint(-10, 10)
         return max(num1, num2) if max_turn else min(num1, num2)
 
     
-    def minimax(self, board, max_turn, depth=0):
+    def minimax(self, board, max_turn, depth, alpha, beta) -> int:
         player = -1 if max_turn else 1
         if self.game.getGameEnded(board, player) != 0:
             return self.score(board, max_turn, depth)
@@ -65,12 +62,22 @@ class MiniMaxPlayer(Player):
         moves = []
 
         empty_cells = [i for (i, valid) in enumerate(self.game.getValidMoves(board, 1)) if valid]
-        for move in empty_cells:
+
+        # best_score = -inf if max_turn else inf
+        # best_idx = 0
+        for idx, move in enumerate(empty_cells):
             curr_board, _ = self.game.getNextState(board, player, move)
-            curr_score = self.minimax(curr_board, (not max_turn), depth)
+            curr_score = self.minimax(curr_board, (not max_turn), depth, alpha, beta)
             scores.append(curr_score)
             moves.append(move)
-        
+
+            if max_turn:
+                alpha = max(alpha, curr_score)
+            else:
+                beta = min(beta, curr_score)
+            if beta <= alpha:
+                break
+
         if max_turn:
             index_max = max(range(len(scores)), key=scores.__getitem__)
             self.move = moves[index_max]

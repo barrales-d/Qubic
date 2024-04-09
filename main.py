@@ -5,6 +5,7 @@ from GUI.isometric import drawISOCubeGrid
 # from Qai.human_player import HumanPlayer
 from Qai.player import HumanPlayer
 from Qai.minimax import MiniMaxPlayer
+from Qai.alphabeta import AlphaBetaPlayer
 
 from GameLogic.qubic import QubicGame
 
@@ -39,6 +40,13 @@ class Arena():
                 if event.type == pygame.QUIT:
                     self.running = False
                     break
+            # draw
+            self.screen.fill(BLACK)
+            pygame.draw.rect(self.screen, GREY, self.main_panel)
+            drawISOCubeGrid(self.screen, board, origin=[(self.main_panel[2] // 3), -100], cellSize=16)
+
+            self.players[curr_player + 1].draw(self.screen, self.bottom_panel, board)
+
             # update
             action = self.players[curr_player + 1].play(self.game.getCanonicalForm(board, curr_player))
             if action == -1:
@@ -46,13 +54,6 @@ class Arena():
                 break
             if(action):
                 board, curr_player = self.game.getNextState(board, curr_player, action)
-
-            # draw
-            pygame.draw.rect(self.screen, GREY, self.main_panel)
-            drawISOCubeGrid(self.screen, board, origin=[(self.main_panel[2] // 3), -100], cellSize=16)
-
-            self.players[curr_player + 1].draw(self.screen, self.bottom_panel, board)
-
 
             self.clock.tick(FPS)
             pygame.display.update()
@@ -68,7 +69,8 @@ def main():
 
     game = QubicGame(4, 4, 4)
     player1 = HumanPlayer(game)
-    player2 = MiniMaxPlayer(game, 2)
+    # player1 = MiniMaxPlayer(game, 2)
+    player2 = AlphaBetaPlayer(game, 2)
 
 
     arena = Arena(game, player1, player2)

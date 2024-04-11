@@ -5,9 +5,9 @@ BTN_COL = GREY
 BTN_H_COL = DARK_GREY
 
 MOUSE_BTN_1 = 0
-BTN_ROUNDED = 5
-BTN_SIZE = 20
-BTN_SPACING = 5
+BTN_ROUNDED = 2
+BTN_SIZE = 28
+BTN_SPACING = 3
 
 def createSquareButton(screen, x, y, w, h, disabled=False, disabled_color=GREY):
     btn_rect = pygame.rect.Rect((x, y, w, h))

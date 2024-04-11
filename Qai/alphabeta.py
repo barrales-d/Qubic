@@ -3,12 +3,12 @@ from math import inf
 from GUI.constants import *
 from GUI.buttons import *
 
-from Qai.player import Player
+from Qai.player import Player, returnStreaks
 
 class AlphaBetaPlayer(Player):
     def __init__(self, game, max_depth=10):
         super().__init__(game)
-        self.move = -inf
+        self.move = None
         self.max_depth = max_depth
         self.font = pygame.font.Font(pygame.font.get_default_font(), 28)
 
@@ -44,9 +44,31 @@ class AlphaBetaPlayer(Player):
             return 0
     
     def eval_board(self, board, max_turn) -> int:
+        streaks = returnStreaks(board)
+        points_max = 0
+        points_min = 0
+        for streak in streaks:
+            streak_sum = sum(streak)
+
+            if streak_sum < 4:
+                points_max += streak_sum if max_turn else int(streak_sum / 2)
+
+            if streak_sum > 510:
+                points_min += 1
+            elif streak_sum > 255:
+                points_min += 2
+            elif streak_sum > 200:
+                points_min += 3
+
         num1 = randint(-10, 10)
         num2 = randint(-10, 10)
-        return max(num1, num2) if max_turn else min(num1, num2)
+        scale = 0
+        if max_turn:
+            scale = max(num1, num2)
+            return (scale * points_max) - (10 * points_min)
+        else:
+            scale = min(num1, num2)
+            return (scale * points_min) - (10 * points_max)
 
     
     def minimax(self, board, max_turn, depth, alpha, beta) -> int:

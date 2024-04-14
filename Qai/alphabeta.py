@@ -10,7 +10,6 @@ class AlphaBetaPlayer(Player):
         super().__init__(game)
         self.move = None
         self.max_depth = max_depth
-        self.font = pygame.font.Font(pygame.font.get_default_font(), 28)
 
     def draw(self, screen, render_area, board):
         pygame.draw.rect(screen, AI_BLUE, render_area)

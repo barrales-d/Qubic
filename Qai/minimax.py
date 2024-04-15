@@ -3,7 +3,9 @@ from math import inf
 from GUI.constants import *
 from GUI.buttons import *
 
-from Qai.player import Player, returnStreaks
+from Qai.player import Player
+
+import threading
 
 class MiniMaxPlayer(Player):
     def __init__(self, game, max_depth=10):
@@ -11,32 +13,21 @@ class MiniMaxPlayer(Player):
         self.move = None
         self.max_depth = max_depth
 
-        self.image = pygame.image.load('./Graphics/ai_bot.png').convert_alpha()
-        self.image = pygame.image.load('./Graphics/ship.gif').convert_alpha()
-        self.image = pygame.transform.scale_by(self.image, 0.5)
-
-    def draw(self, screen, render_area, board):
-        pygame.draw.rect(screen, AI_BLUE, render_area)
-        # TODO: draw a pixel ai_bot to use over the temp image 
-        for rack in range(4):
-            for row in range(4):
-                for col in range(4):
-                    pos_x = (BTN_SIZE + BTN_SPACING)*col + BTN_SPACING + (BTN_SIZE*6*rack)
-                    pos_y = (BTN_SIZE + BTN_SPACING)*row + BTN_SPACING
-
-                    cell = board[rack][row][col]
-                    color = GREY
-                    if cell == 1: color = RED
-                    if cell == -1: color = BLUE
-                    
-                    createSquareButton(screen, pos_x, render_area[1] + pos_y, BTN_SIZE, BTN_SIZE, disabled=True, disabled_color=color)
+        self.mutex_locked = False
         
-        padding = 10
-        screen.blit(self.image, (render_area[2] - self.image.get_width() - padding*2, render_area[1] + padding))
-
     def play(self, board) -> int | None:
-        self.minimax(board, True)
-        return self.move
+        if not self.mutex_locked:
+            thread_worker = threading.Thread(target=self.minimax, args=(board, True,))
+            thread_worker.start()
+            self.mutex_locked = True
+        else:
+            if thread_worker.is_alive():
+                return None
+            
+            return self.move
+
+        # self.minimax(board, True)
+        # return self.move
 
     def score(self, board, max_turn, depth):
         player = -1 if max_turn else 1
@@ -50,7 +41,7 @@ class MiniMaxPlayer(Player):
             return 0
     
     def eval_board(self, board, max_turn):
-        streaks = returnStreaks(board)
+        streaks = self.returnStreaks(board)
         points_max = 0
         points_min = 0
         for streak in streaks:

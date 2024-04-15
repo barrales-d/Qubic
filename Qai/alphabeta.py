@@ -11,22 +11,6 @@ class AlphaBetaPlayer(Player):
         self.move = None
         self.max_depth = max_depth
 
-    def draw(self, screen, render_area, board):
-        pygame.draw.rect(screen, AI_BLUE, render_area)
-        
-        for rack in range(4):
-            for row in range(4):
-                for col in range(4):
-                    pos_x = (BTN_SIZE + BTN_SPACING)*col + BTN_SPACING + (BTN_SIZE*6*rack)
-                    pos_y = (BTN_SIZE + BTN_SPACING)*row + BTN_SPACING
-
-                    cell = board[rack][row][col]
-                    color = GREY
-                    if cell == 1: color = RED
-                    if cell == -1: color = BLUE
-                    
-                    createSquareButton(screen, pos_x, render_area[1] + pos_y, BTN_SIZE, BTN_SIZE, disabled=True, disabled_color=color)
-    
     def play(self, board) -> int | None:
         self.minimax(board, True, 0, -inf, inf)
         return self.move
@@ -43,7 +27,7 @@ class AlphaBetaPlayer(Player):
             return 0
     
     def eval_board(self, board, max_turn) -> int:
-        streaks = returnStreaks(board)
+        streaks = self.returnStreaks(board)
         points_max = 0
         points_min = 0
         for streak in streaks:

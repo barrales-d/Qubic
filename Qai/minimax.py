@@ -6,33 +6,18 @@ from GUI.buttons import *
 
 from Qai.player import Player
 
-import threading
-
 class MiniMaxPlayer(Player):
     def __init__(self, game, player, max_depth=10):
         super().__init__(game)
         self.move = None
         self.max_depth = max_depth
-        self.player = player
-
-        self.mutex_locked = False
-    
+        self.player = player    
     def __str__(self) -> str: return "Mini Max"
 
     def play(self, board) -> int | None:
-        # if not self.mutex_locked:
-        #     thread_worker = threading.Thread(target=self.minimax, args=(board, True,))
-        #     thread_worker.start()
-        #     self.mutex_locked = True
-        #     return None
-        # else:
-        #     if thread_worker.is_alive():
-        #         return None
-        #     self.mutex_locked = False
-        #     return self.move
-
         self.minimax(board, True)
         return self.move
+
 
     def score(self, board, max_turn, depth):
         player = -1 if max_turn else 1
@@ -83,11 +68,14 @@ class MiniMaxPlayer(Player):
         streak_score = self.attributes['in-a-row'] * len(streaks) + self.attributes['per-streak'] * sum(streaks)
         block_score = self.attributes['total-block'] * len(blocks)
 
-        print("Streak Score:", streak_score)
+        print("Streak Score:", streaks)
         print("Block Score:", block_score)
         print("-"*20)
         # time.sleep(1)
-        return int(streak_score + block_score)
+        if max_turn:
+            return int(streak_score + block_score)
+        else:
+            return int(streak_score - block_score)
     
     def minimax(self, board, max_turn, depth=0):
         player = -1 if max_turn else 1

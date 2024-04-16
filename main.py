@@ -1,3 +1,4 @@
+import random
 import pygame
 import os
 
@@ -37,6 +38,13 @@ class Arena():
         self.ai_avatar = pygame.image.load('./Graphics/ai_bot.png').convert_alpha()
         self.ai_avatar = pygame.transform.scale_by(self.ai_avatar, 0.5)
 
+        self.ai_positions = [
+            (self.bottom_panel[0] + self.ai_avatar.get_width() // 2 + padding*2, self.bottom_panel[1] + padding),
+            (self.bottom_panel[2] - self.ai_avatar.get_width() - padding*2, self.bottom_panel[1] + padding),
+            (self.main_panel[2] // 2 - self.main_panel[2] // 3 - self.ai_avatar.get_width() // 2, self.main_panel[3] - self.ai_avatar.get_height() + padding),
+            (self.main_panel[2] // 2 + self.ai_avatar.get_width(), self.main_panel[3] - self.ai_avatar.get_height()  + padding)
+        ]
+
 
     def play_game(self):        
         while self.running and self.game.getGameEnded(self.board, self.curr_player) == 0:
@@ -60,7 +68,9 @@ class Arena():
     def draw(self):
         self.screen.fill(BLACK)
         pygame.draw.rect(self.screen, OFF_WHITE, self.main_panel, border_radius=PANEL_ROUNDED)
-        drawISOCubeGrid(self.screen, self.board, origin=[(self.main_panel[2] // 3), -100], cellSize=16)
+        padding = 10
+        drawISOCubeGrid(self.screen, self.board, origin=[(self.main_panel[2] // 3) + padding, -100 + padding] , cellSize=23)
+
         if(type(self.players[self.curr_player + 1]) == HumanPlayer):
             move = self.draw_human_board(self.board)
             self.players[self.curr_player + 1].set_move(move)
@@ -109,8 +119,16 @@ class Arena():
         pygame.draw.rect(self.screen, OFF_WHITE, self.bottom_panel, width=2, border_radius=PANEL_ROUNDED)
         self.draw_board(board)
 
-        padding = 10
-        self.screen.blit(self.ai_avatar, (self.bottom_panel[2] - self.ai_avatar.get_width() - padding*2, self.bottom_panel[1] + padding))
+        if self.curr_player + 1 == 0:
+            # blue ai
+            pygame.draw.rect(self.screen, BLUE, (0, 0, 50, 50))
+            pass
+        else:
+            # red ai
+            pygame.draw.rect(self.screen, RED, (0, 0, 50, 50))
+            pass
+
+        self.screen.blit(self.ai_avatar, random.choice(self.ai_positions))
     
     def draw_side(self):
         title_font = pygame.font.Font(None, 50)
@@ -144,7 +162,7 @@ class Arena():
 def main():
     pygame.init()
     pygame.font.init()
-    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.SCALED)
     pygame.display.set_caption("Qubic")
     game = QubicGame(4, 4, 4)
     player1 = HumanPlayer(game)

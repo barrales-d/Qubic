@@ -1,5 +1,6 @@
 from random import randint
 from math import inf
+import time
 from GUI.constants import *
 from GUI.buttons import *
 
@@ -8,26 +9,30 @@ from Qai.player import Player
 import threading
 
 class MiniMaxPlayer(Player):
-    def __init__(self, game, max_depth=10):
+    def __init__(self, game, player, max_depth=10):
         super().__init__(game)
         self.move = None
         self.max_depth = max_depth
+        self.player = player
 
         self.mutex_locked = False
-        
-    def play(self, board) -> int | None:
-        if not self.mutex_locked:
-            thread_worker = threading.Thread(target=self.minimax, args=(board, True,))
-            thread_worker.start()
-            self.mutex_locked = True
-        else:
-            if thread_worker.is_alive():
-                return None
-            
-            return self.move
+    
+    def __str__(self) -> str: return "Mini Max"
 
-        # self.minimax(board, True)
-        # return self.move
+    def play(self, board) -> int | None:
+        # if not self.mutex_locked:
+        #     thread_worker = threading.Thread(target=self.minimax, args=(board, True,))
+        #     thread_worker.start()
+        #     self.mutex_locked = True
+        #     return None
+        # else:
+        #     if thread_worker.is_alive():
+        #         return None
+        #     self.mutex_locked = False
+        #     return self.move
+
+        self.minimax(board, True)
+        return self.move
 
     def score(self, board, max_turn, depth):
         player = -1 if max_turn else 1
@@ -39,35 +44,50 @@ class MiniMaxPlayer(Player):
             return depth - 10
         else:
             return 0
-    
-    def eval_board(self, board, max_turn):
-        streaks = self.returnStreaks(board)
-        points_max = 0
-        points_min = 0
-        for streak in streaks:
-            streak_sum = sum(streak)
-
-            if streak_sum < 4:
-                points_max += streak_sum if max_turn else int(streak_sum / 2)
-
-            if streak_sum > 510:
-                points_min += 1
-            elif streak_sum > 255:
-                points_min += 2
-            elif streak_sum > 200:
-                points_min += 3
-
-        num1 = randint(-10, 10)
-        num2 = randint(-10, 10)
-        scale = 0
-        if max_turn:
-            scale = max(num1, num2)
-            return (scale * points_max) - (10 * points_min)
+        
+    def get_streaks(self, board):
+        if self.player == 1:
+            return self.returnStreaks(board)
         else:
-            scale = min(num1, num2)
-            return (scale * points_min) - (10 * points_max)
+            opp_board = []
+            for line in self.returnStreaks(board):
+                opp_line = []
+                for x in line:
+                    if x == 1:
+                        opp_line.append(255)
+                    elif x == 255:
+                        opp_line.append(1)
+                    else:
+                        opp_line.append(0)
+                opp_board.append(opp_line)
+            
+            return opp_board
 
+    def eval_board(self, board, max_turn):
+        # filter out all completely empty lines i.e: [0, 0, 0, 0]
+        state = [list(line) for line in self.get_streaks(board) if sum(line) != 0]
 
+        streaks = []
+        blocks = []
+        # if not max_turn:
+        # [1,0,0,0] || [1,1,0,0] || [1,1,1,0] || [1,1,1,1]
+        streaks = [sum(line) for line in state if sum(line) <= 4]
+        # [255,255,255,1]
+        blocks = [1 for line in state if sum(line) == 766 and line.count(255) == 3]
+        # else:
+        #     # [255,0,0,0] || [255,255,0,0] || [255,255,255,0] || [255,255,255,255]
+        #     streaks = [line.count(255) for line in state if sum(line) % 255 == 0]
+        #     # [1,1,1,255]
+        #     blocks = [1 for line in state if sum(line) == 258 and line.count(1) == 3]
+
+        streak_score = self.attributes['in-a-row'] * len(streaks) + self.attributes['per-streak'] * sum(streaks)
+        block_score = self.attributes['total-block'] * len(blocks)
+
+        print("Streak Score:", streak_score)
+        print("Block Score:", block_score)
+        print("-"*20)
+        # time.sleep(1)
+        return int(streak_score + block_score)
     
     def minimax(self, board, max_turn, depth=0):
         player = -1 if max_turn else 1

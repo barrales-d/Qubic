@@ -12,3 +12,8 @@ AI_BLUE = (56, 81, 119)
 FPS = 30
 WIDTH = 640
 HEIGHT = 480
+
+def display_text(screen, font, pos, text):
+        text_surface = font.render(text, True, WHITE)
+        text_rect = text_surface.get_rect(center = pos)
+        screen.blit(text_surface, text_rect)

@@ -3,13 +3,15 @@ from math import inf
 from GUI.constants import *
 from GUI.buttons import *
 
-from Qai.player import Player, returnStreaks
+from Qai.player import Player
 
 class AlphaBetaPlayer(Player):
     def __init__(self, game, max_depth=10):
         super().__init__(game)
         self.move = None
         self.max_depth = max_depth
+
+    def __str__(self) -> str: return "Alpha Beta"
 
     def play(self, board) -> int | None:
         self.minimax(board, True, 0, -inf, inf)
@@ -27,6 +29,26 @@ class AlphaBetaPlayer(Player):
             return 0
     
     def eval_board(self, board, max_turn) -> int:
+        # filter out all completely empty lines i.e: [0, 0, 0, 0]
+        state = [list(line) for line in self.returnStreaks(board) if sum(line) != 0]
+
+        streaks = []
+        blocks = []
+        if max_turn:
+            # [1,0,0,0] || [1,1,0,0] || [1,1,1,0] || [1,1,1,1]
+            streaks = [sum(line) for line in state if sum(line) <= 4]
+            # [255,255,255,1]
+            blocks = [1 for line in state if sum(line) == 766 and line.count(255) == 3]
+        else:
+            # [255,0,0,0] || [255,255,0,0] || [255,255,255,0] || [255,255,255,255]
+            streaks = [line.count(255) for line in state if sum(line) % 255 == 0]
+            # [1,1,1,255]
+            blocks = [1 for line in state if sum(line) == 766 and line.count(1) == 3]
+
+
+        streak_score = self.attributes['in-a-row'] * len(streaks) + self.attributes['per-streak'] * sum(streaks)
+        block_score = self.attributes['total-block'] * len(blocks)
+        return int(streak_score + block_score)
         streaks = self.returnStreaks(board)
         points_max = 0
         points_min = 0

@@ -10,6 +10,12 @@ class Player:
     def play(self, board) -> int | None:
         pass
 
+    # AI attributes scalars
+    attributes = {
+        'in-a-row': 0.25,
+        'per-streak': 0.55,
+        'total-block': 0.925,
+    }
     # Copied from GameLogic.board
     def returnStreaks(self, board):
         streak = np.zeros((76, 4), dtype=np.uint8)
@@ -103,6 +109,8 @@ class HumanPlayer(Player):
         super().__init__(game)
         self.move = None
     
+    def __str__(self) -> str: return "Human"
+
     def set_move(self, move):
         self.move = move
     

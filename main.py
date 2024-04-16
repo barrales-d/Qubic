@@ -28,7 +28,7 @@ class Arena():
         main_panel_height = HEIGHT - bottom_panel_height
         
         self.main_panel = (0, 0, main_panel_width, main_panel_height)
-        self.side_panel = (WIDTH - side_panel_width, 0, WIDTH, main_panel_height)
+        self.side_panel = (WIDTH - side_panel_width, 0, side_panel_width, main_panel_height)
         self.bottom_panel = (0, HEIGHT - bottom_panel_height, WIDTH, bottom_panel_height)
 
         self.ai_avatar = pygame.image.load('./Graphics/ai_bot.png').convert_alpha()
@@ -44,14 +44,10 @@ class Arena():
                 if event.type == pygame.QUIT:
                     self.running = False
                     break
-            # update
-            action = self.players[curr_player + 1].play(self.game.getCanonicalForm(board, curr_player))
-            if action != None:
-                if action == -1:
-                    self.running == False
-                    break
-                else:
-                    board, curr_player = self.game.getNextState(board, curr_player, action)
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        print("="*30)
+                        print(self.players[curr_player + 1].returnStreaks(board))
             # draw
             self.screen.fill(BLACK)
             pygame.draw.rect(self.screen, GREY, self.main_panel)
@@ -63,14 +59,30 @@ class Arena():
             else:
                 self.draw_ai_board(board)
 
+            pygame.draw.rect(self.screen, DARK_GREY, self.side_panel)
+            center_pos = (self.side_panel[0] + self.side_panel[2] // 2, self.side_panel[1] + self.side_panel[3] // 3)
+            display_text(self.screen, pygame.font.Font(None, 30), center_pos, "Qubic")
+            display_text(self.screen, pygame.font.Font(None), (center_pos[0], center_pos[1] + 30), "Player 1: " + str(self.players[2]))
+            pygame.draw.rect(self.screen, RED, (center_pos[0] - 15, center_pos[1] + 45, 30, 30), border_radius=BTN_ROUNDED*2)
+            display_text(self.screen, pygame.font.Font(None), (center_pos[0], center_pos[1] + 90), "Player 2: " + str(self.players[0]))
+            pygame.draw.rect(self.screen, BLUE, (center_pos[0] - 15, center_pos[1] + 115, 30, 30), border_radius=BTN_ROUNDED*2)
 
 
-            print("continuing rendering screen")
+
             self.clock.tick(FPS)
             # Update is called in the middle of game loop because AI.play runs until completion
             # So if it was a the bottom, the screen wouldn't update until after the AI algorithms complete
             # This way, the AI.draw() gets shown at least once before the game freezes
             pygame.display.update()
+
+            # update
+            action = self.players[curr_player + 1].play(self.game.getCanonicalForm(board, curr_player))
+            if action != None:
+                if action == -1:
+                    self.running == False
+                    break
+                else:
+                    board, curr_player = self.game.getNextState(board, curr_player, action)
         
         return self.game.getGameEnded(board, curr_player)
 
@@ -114,11 +126,10 @@ def main():
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Qubic")
     game = QubicGame(4, 4, 4)
-
-    player1 = HumanPlayer(game)
+    # player1 = HumanPlayer(game)
     # player2 = HumanPlayer(game)
-    # player1 = AlphaBetaPlayer(game, 2)
-    player2 = MiniMaxPlayer(game, 2)
+    player1 = MiniMaxPlayer(game, 1, 2)
+    player2 = MiniMaxPlayer(game, 2, 2)
     arena = Arena(screen, game, player1, player2)
     arena.play_game()
 

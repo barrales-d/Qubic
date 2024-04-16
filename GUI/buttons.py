@@ -21,31 +21,12 @@ def createSquareButton(screen, x, y, w, h, disabled=False, disabled_color=GREY):
 
     
     btn_color = btn_color if not disabled else disabled_color
-    pygame.draw.rect(screen, btn_color, btn_rect, 0, BTN_ROUNDED, BTN_ROUNDED, BTN_ROUNDED, BTN_ROUNDED, BTN_ROUNDED)
-    pygame.draw.rect(screen, btn_outline, btn_rect, 2, BTN_ROUNDED, BTN_ROUNDED, BTN_ROUNDED, BTN_ROUNDED, BTN_ROUNDED)
+    pygame.draw.rect(screen, btn_color, btn_rect, border_radius=BTN_ROUNDED)
+    pygame.draw.rect(screen, btn_outline, btn_rect, BTN_SPACING, border_radius=BTN_ROUNDED)
     
     if not disabled:
         if(pygame.mouse.get_pressed()[MOUSE_BTN_1]):
             if(hovered):
                 return True
     
-    return False
-
-def createButton(screen, x, y, w, h, color=BTN_COL):
-    btn_rect = pygame.rect.Rect((x, y, w, h))
-    mouse_pos = pygame.mouse.get_pos()
-    hovered = btn_rect.collidepoint(mouse_pos)
-    btn_color = color
-    btn_outline = BTN_H_COL
-    if(hovered):
-        btn_color = BTN_H_COL
-        btn_outline = BTN_COL
-
-    
-    pygame.draw.rect(screen, btn_color, btn_rect, 0, BTN_ROUNDED, BTN_ROUNDED, BTN_ROUNDED, BTN_ROUNDED, BTN_ROUNDED)
-    pygame.draw.rect(screen, btn_outline, btn_rect, 5, BTN_ROUNDED, BTN_ROUNDED, BTN_ROUNDED, BTN_ROUNDED, BTN_ROUNDED)
-    
-    if(pygame.mouse.get_pressed()[MOUSE_BTN_1]):
-        if(hovered):
-            return True
     return False

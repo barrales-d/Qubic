@@ -1,3 +1,0 @@
-[submodule "GameLogic/pytorch_classification"]
-	path = GameLogic/pytorch_classification
-	url = https://github.com/bearpaw/pytorch-classification.git

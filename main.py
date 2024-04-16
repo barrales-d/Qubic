@@ -25,6 +25,9 @@ class Arena():
         self.screen = screen
         self.running = True
 
+        self.title_font = pygame.font.Font(None, 50)
+        self.regular_font = pygame.font.Font(None, 25)
+
         bottom_panel_height = 125
         side_panel_width  = 150
         
@@ -131,8 +134,6 @@ class Arena():
         self.screen.blit(self.ai_avatar, random.choice(self.ai_positions))
     
     def draw_side(self):
-        title_font = pygame.font.Font(None, 50)
-        regular_font = pygame.font.Font(None, 25)
         # padding is 10 so (10 * 2)
         text_area = self.side_panel[2] - 20
         rect_size = 20
@@ -140,15 +141,15 @@ class Arena():
         pygame.draw.rect(self.screen, OFF_WHITE, self.side_panel, width=2, border_radius=PANEL_ROUNDED)
         
         text_pos = (self.side_panel[0] + self.side_panel[2] // 2, self.side_panel[1] + self.side_panel[3] // 3)
-        display_text(self.screen, "Qubic", title_font, text_pos, width=text_area)
+        display_text(self.screen, "Qubic", self.title_font, text_pos, width=text_area)
 
         text_pos = (text_pos[0], text_pos[1] + 45)
-        display_text(self.screen, "Player 1: " + str(self.players[2]), regular_font, text_pos, width=text_area)
+        display_text(self.screen, "Player 1: " + str(self.players[2]), self.regular_font, text_pos, width=text_area)
 
         rect_pos = (text_pos[0] - rect_size // 2 + self.side_panel[2] // 3, text_pos[1] - rect_size // 2)
 
         text_pos = (text_pos[0], text_pos[1] + 45)
-        display_text(self.screen, "Player 2: " + str(self.players[0]), regular_font, text_pos, width=text_area)
+        display_text(self.screen, "Player 2: " + str(self.players[0]), self.regular_font, text_pos, width=text_area)
 
         pygame.draw.rect(self.screen, RED, (rect_pos[0], rect_pos[1], rect_size, rect_size), border_radius=BTN_ROUNDED*2)
         

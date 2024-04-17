@@ -2,9 +2,30 @@
 #### By: Diego Barrales,
 #### Created for my CPSC 481 AI course final project
 
+# Getting Started!
+1. After cloning this repo into a local folder open the project in the terminal(or vscode terminal)
+2. Create a python virtual environment
+    ```console
+    <!-- IF on Linux or Linux like terminal -->
+    $  python3 -m venv "venv"
+    $  source venv/bin/activate
+
+    <!-- IF on Windows or Windows like terminal -->
+    $  py.exe -m venv "venv"
+    $  ./venv/Scripts/activate
+    ```
+3. Installing the required python modules:
+    ```console
+    (venv)$  pip3 install -r requirements.txt
+    ```
+4. Run the game!
+    ```console
+    (venv)$  python3 main.py
+    ```
+
 # Problem Statement
 Qubic is a 3D tic-tac-toe variant in which two players take turns to place pieces on a 4x4x4 cube board consisting of 64 cells. The goal is to get four pieces lined up in a row. I will implement a competitive AI agent that humans can play against. In addition, I want to visualize the agent's thinking process through a simple graphical user interface that humans can use to play the game.
-    
+
 ## State Space Representation
 | Properties of Qubic Environment | Details |
 |--|--|

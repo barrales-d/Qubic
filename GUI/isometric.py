@@ -1,7 +1,7 @@
 import sys
 import numpy as np
 import pygame
-from pygame.locals import KEYDOWN, K_q
+# from pygame.locals import KEYDOWN, K_q
 
 from GUI.constants import *
 
@@ -123,7 +123,7 @@ def checkEvents():
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
-        elif event.type == KEYDOWN and event.key == K_q:
+        elif event.type == pygame.KEYDOWN and event.key == pygame.K_q:
             pygame.quit()
             sys.exit()
 

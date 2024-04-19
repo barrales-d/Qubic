@@ -15,6 +15,7 @@ class MiniMaxPlayer(Player):
     def __str__(self) -> str: return "Mini Max"
 
     def play(self, board) -> int | None:
+        self.move = None
         self.minimax(board, True)
         return self.move
 
@@ -29,28 +30,10 @@ class MiniMaxPlayer(Player):
             return depth - 10
         else:
             return 0
-        
-    def get_streaks(self, board):
-        if self.player == 1:
-            return self.returnStreaks(board)
-        else:
-            opp_board = []
-            for line in self.returnStreaks(board):
-                opp_line = []
-                for x in line:
-                    if x == 1:
-                        opp_line.append(255)
-                    elif x == 255:
-                        opp_line.append(1)
-                    else:
-                        opp_line.append(0)
-                opp_board.append(opp_line)
-            
-            return opp_board
 
     def eval_board(self, board, max_turn):
         # filter out all completely empty lines i.e: [0, 0, 0, 0]
-        state = [list(line) for line in self.get_streaks(board) if sum(line) != 0]
+        state = [list(line) for line in self.returnStreaks(board) if sum(line) != 0]
 
         streaks = []
         blocks = []
@@ -68,9 +51,9 @@ class MiniMaxPlayer(Player):
         streak_score = self.attributes['in-a-row'] * len(streaks) + self.attributes['per-streak'] * sum(streaks)
         block_score = self.attributes['total-block'] * len(blocks)
 
-        print("Streak Score:", streaks)
-        print("Block Score:", block_score)
-        print("-"*20)
+        # print("Streak Score:", streaks)
+        # print("Block Score:", block_score)
+        # print("-"*20)
         # time.sleep(1)
         if max_turn:
             return int(streak_score + block_score)
@@ -89,10 +72,10 @@ class MiniMaxPlayer(Player):
         scores = []
         moves = []
 
-        empty_cells = [i for (i, valid) in enumerate(self.game.getValidMoves(board, 1)) if valid]
+        empty_cells = [i for (i, valid) in enumerate(self.game.getValidMoves(self.game.getCanonicalForm(board, player), 1)) if valid]
         for move in empty_cells:
             curr_board, _ = self.game.getNextState(board, player, move)
-            curr_score = self.minimax(curr_board, (not max_turn), depth)
+            curr_score = self.minimax(self.game.getCanonicalForm(curr_board, player), (not max_turn), depth)
             scores.append(curr_score)
             moves.append(move)
         

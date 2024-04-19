@@ -2,6 +2,7 @@ import random
 import pygame
 import os
 
+from GUI.animator import Animator
 from GUI.buttons import *
 from GUI.constants import *
 from GUI.isometric import drawISOCubeGrid
@@ -38,19 +39,17 @@ class Arena():
         self.side_panel = (padding + WIDTH - side_panel_width, padding, side_panel_width - padding*2, main_panel_height - padding)
         self.bottom_panel = (padding, padding + HEIGHT - bottom_panel_height, WIDTH - padding*2, bottom_panel_height - padding)
 
-        self.ai_avatar = pygame.image.load('./Graphics/ai_bot.png').convert_alpha()
-        self.ai_avatar = pygame.transform.scale_by(self.ai_avatar, 0.5)
+        ai_position = (self.side_panel[0] + self.side_panel[2] // 2 + padding // 2, self.side_panel[3] - padding*6)
+        self.animator = Animator('./Graphics/AIBot.png', 256, 3, 3, ai_position)
+        self.animator.add('red', 100, 1, 4)
+        self.animator.add('blue', 100, 5, 8)
 
-        self.ai_positions = [
-            (self.bottom_panel[0] + self.ai_avatar.get_width() // 2 + padding*2, self.bottom_panel[1] + padding),
-            (self.bottom_panel[2] - self.ai_avatar.get_width() - padding*2, self.bottom_panel[1] + padding),
-            (self.main_panel[2] // 2 - self.main_panel[2] // 3 - self.ai_avatar.get_width() // 2, self.main_panel[3] - self.ai_avatar.get_height() + padding),
-            (self.main_panel[2] // 2 + self.ai_avatar.get_width(), self.main_panel[3] - self.ai_avatar.get_height()  + padding)
-        ]
+    def play_game(self):
+        while self.running:
+            if self.game.getGameEnded(self.board, self.curr_player) != 0:
+                self.running = False
+                break
 
-
-    def play_game(self):        
-        while self.running and self.game.getGameEnded(self.board, self.curr_player) == 0:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
@@ -65,6 +64,14 @@ class Arena():
             self.update()
         
         return self.game.getGameEnded(self.board, self.curr_player)
+        # self.running = True
+        # while self.running:
+        #     for event in pygame.event.get():
+        #         if event.type == pygame.QUIT:
+        #             self.running = False
+        #             break
+        #     self.draw()
+        # return self.game.getGameEnded(self.board, self.curr_player)
 
         # pygame.quit()
     
@@ -74,13 +81,13 @@ class Arena():
         padding = 10
         drawISOCubeGrid(self.screen, self.board, origin=[(self.main_panel[2] // 3) + padding, -100 + padding] , cellSize=23)
 
+        self.draw_side()
+
         if(type(self.players[self.curr_player + 1]) == HumanPlayer):
             move = self.draw_human_board(self.board)
             self.players[self.curr_player + 1].set_move(move)
         else:
             self.draw_ai_board(self.board)
-
-        self.draw_side()
 
         self.clock.tick(FPS)
         # Update is called in the middle of game loop because AI.play runs until completion
@@ -89,12 +96,26 @@ class Arena():
         pygame.display.update()
     
     def update(self):
-        action = self.players[self.curr_player + 1].play(self.game.getCanonicalForm(self.board, self.curr_player))
-        if action != None:
-            if action == -1:
-                self.running == False
-            else:
-                self.board, self.curr_player = self.game.getNextState(self.board, self.curr_player, action)
+        self.animator.update()
+        canonical_board = self.game.getCanonicalForm(self.board, self.curr_player)
+        action = self.players[self.curr_player + 1].play(canonical_board)
+        if action == None: return
+
+        if action == -1:
+            self.running == False
+            return
+        valid_moves = [i for (i, valid) in enumerate(self.game.getValidMoves(canonical_board, self.curr_player)) if valid]
+        if action in valid_moves:
+            self.board, self.curr_player = self.game.getNextState(self.board, self.curr_player, action)
+        else:
+            rack = int(action / 16)
+            row = int((action % 16) / 4)
+            col = int((action % 16) % 4)
+            print("ERROR: Trying to place piece at:", f'({rack}, {row}, {col})')
+            self.players[self.curr_player].max_depth += 1
+        #     print(self.curr_player)
+        #     print(self.board)
+        #     exit(1)
 
     def draw_board(self, board):
         for rack in range(4):
@@ -121,17 +142,13 @@ class Arena():
     def draw_ai_board(self, board):
         pygame.draw.rect(self.screen, OFF_WHITE, self.bottom_panel, width=2, border_radius=PANEL_ROUNDED)
         self.draw_board(board)
-
+        
         if self.curr_player + 1 == 0:
-            # blue ai
-            pygame.draw.rect(self.screen, BLUE, (0, 0, 50, 50))
-            pass
+            self.animator.play('blue')
         else:
-            # red ai
-            pygame.draw.rect(self.screen, RED, (0, 0, 50, 50))
-            pass
+            self.animator.play('red')
 
-        self.screen.blit(self.ai_avatar, random.choice(self.ai_positions))
+        self.animator.draw(self.screen)
     
     def draw_side(self):
         # padding is 10 so (10 * 2)
@@ -159,6 +176,9 @@ class Arena():
 
 
 
+STATE_MENU = (1 << 0)
+STATE_PLAY = (1 << 1)
+STATE_END  = (1 << 3)
 
 def main():
     pygame.init()
@@ -166,14 +186,72 @@ def main():
     screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.SCALED)
     pygame.display.set_caption("Qubic")
     game = QubicGame(4, 4, 4)
-    player1 = HumanPlayer(game)
-    # player2 = HumanPlayer(game)
-    # player1 = MiniMaxPlayer(game, 1, 2)
-    player2 = MiniMaxPlayer(game, 2, 2)
-    # player2 = AlphaBetaPlayer(game, 2)
-    arena = Arena(screen, game, player1, player2)
-    arena.play_game()
 
+    running = True
+    state = STATE_MENU
+    winner = None
+    player1 = None
+    player2 = None
+    title_font = pygame.font.Font(None, 75)
+    btn_font = pygame.font.Font(None, 35)
+
+
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+                break
+        
+        if state == STATE_MENU:
+            screen.fill(BLACK)
+            center = [WIDTH // 2, HEIGHT // 3]
+            display_text(screen, "QUBIC", title_font, center)
+            center[1] += 100
+            if textButton(screen, btn_font, "Human VS Human", center, BLACK, WHITE):
+                player1 = HumanPlayer(game)
+                player2 = HumanPlayer(game)
+                state = STATE_PLAY
+            
+            center[1] += 50
+            if textButton(screen, btn_font, "Human VS Mini Max", center, BLACK, WHITE):
+                player1 = HumanPlayer(game)
+                player2 = MiniMaxPlayer(game, 2, 2)
+                state = STATE_PLAY
+
+            center[1] += 50
+            if textButton(screen, btn_font, "Human VS Alpha Beta", center, BLACK, WHITE):
+                player1 = HumanPlayer(game)
+                player2 = AlphaBetaPlayer(game, 2)
+                state = STATE_PLAY
+
+            center[1] += 50
+            if textButton(screen, btn_font, "Mini Max VS Alpha Beta", center, BLACK, WHITE):
+                player1 = MiniMaxPlayer(game, 1, 2)
+                player2 = AlphaBetaPlayer(game, 2)
+                state = STATE_PLAY
+
+        elif state == STATE_PLAY:
+            arena = Arena(screen, game, player1, player2)
+            winner = arena.play_game()
+            state = STATE_END
+
+        elif state == STATE_END:
+            winner_text = "It is a Draw!"
+            if winner == 1:
+                # print("Player 2 won!")
+                winner_text = "Player 2 won!"
+            elif winner == -1:
+                # print("Player 1 won!")
+                winner_text = "Player 1 won!"
+
+            print(winner_text)
+            # text_surface = title_font.render(winner_text, True, WHITE, BLACK)
+            # text_rect = text_surface.get_rect(center = (WIDTH // 2, HEIGHT // 2))
+            # screen.blit(text_surface, text_rect)
+        
+        pygame.display.update()
+    
+    pygame.quit()
 
 if __name__ == "__main__":
     main()

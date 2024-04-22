@@ -29,26 +29,15 @@ class Arena():
         self.title_font = pygame.font.Font(None, 50)
         self.regular_font = pygame.font.Font(None, 25)
 
-        bottom_panel_height = 125
-        side_panel_width  = 150
-        
-        main_panel_width = WIDTH - side_panel_width
-        main_panel_height = HEIGHT - bottom_panel_height
-        padding = 10
-        self.main_panel = (padding, padding, main_panel_width - padding, main_panel_height - padding)
-        self.side_panel = (padding + WIDTH - side_panel_width, padding, side_panel_width - padding*2, main_panel_height - padding)
-        self.bottom_panel = (padding, padding + HEIGHT - bottom_panel_height, WIDTH - padding*2, bottom_panel_height - padding)
-
-        ai_position = (self.side_panel[0] + self.side_panel[2] // 2 + padding // 2, self.side_panel[3] - padding*6)
+        ai_position = (SIDE_PANEL[0] + SIDE_PANEL[2] // 2 + GPAD // 2, SIDE_PANEL[3] - GPAD*6)
         self.animator = Animator('./Graphics/AIBot.png', 256, 3, 3, ai_position)
         self.animator.add('red', 100, 1, 4)
         self.animator.add('blue', 100, 5, 8)
 
     def draw(self):
         self.screen.fill(BLACK)
-        pygame.draw.rect(self.screen, OFF_WHITE, self.main_panel, border_radius=PANEL_ROUNDED)
-        padding = 10
-        drawISOCubeGrid(self.screen, self.board, origin=[(self.main_panel[2] // 3) + padding, -100 + padding] , cellSize=23)
+        pygame.draw.rect(self.screen, OFF_WHITE, MAIN_PANEL, border_radius=PANEL_ROUNDED)
+        drawISOCubeGrid(self.screen, self.board, origin=[(MAIN_PANEL[2] // 3) + GPAD, -100 + GPAD] , cellSize=23)
 
         self.draw_side()
 
@@ -87,11 +76,11 @@ class Arena():
         #     exit(1)
 
     def draw_board(self, board):
-        pygame.draw.rect(self.screen, OFF_WHITE, self.bottom_panel, width=2, border_radius=PANEL_ROUNDED)
+        pygame.draw.rect(self.screen, OFF_WHITE, BOTTOM_PANEL, width=2, border_radius=PANEL_ROUNDED)
         for rack in range(4):
             for row in range(4):
                 for col in range(4):
-                    pos_x = (BTN_SIZE + BTN_SPACING)*col + BTN_SPACING + (BTN_SIZE*6*rack) + self.bottom_panel[0]*6
+                    pos_x = (BTN_SIZE + BTN_SPACING)*col + BTN_SPACING + (BTN_SIZE*6*rack) + BOTTOM_PANEL[0]*6
                     pos_y = (BTN_SIZE + BTN_SPACING)*row + BTN_SPACING + 5
 
                     cell = board[rack][row][col]
@@ -100,10 +89,10 @@ class Arena():
                     if cell == -1: color = BLUE
 
                     if cell == 0:
-                        if createSquareButton(self.screen, pos_x, self.bottom_panel[1] + pos_y, BTN_SIZE, BTN_SIZE):
+                        if createSquareButton(self.screen, pos_x, BOTTOM_PANEL[1] + pos_y, BTN_SIZE, BTN_SIZE):
                             return 16 * rack + 4 * row + col
                     else:
-                        createSquareButton(self.screen, pos_x, self.bottom_panel[1] + pos_y, BTN_SIZE, BTN_SIZE, disabled=True, disabled_color=color)
+                        createSquareButton(self.screen, pos_x, BOTTOM_PANEL[1] + pos_y, BTN_SIZE, BTN_SIZE, disabled=True, disabled_color=color)
 
     def draw_ai_board(self, board):
         self.draw_board(board)
@@ -116,19 +105,18 @@ class Arena():
         self.animator.draw(self.screen)
     
     def draw_side(self):
-        # padding is 10 so (10 * 2)
-        text_area = self.side_panel[2] - 20
-        rect_size = 20
+        text_area = SIDE_PANEL[2] - GPAD * 2
+        rect_size = GPAD * 2
 
-        pygame.draw.rect(self.screen, OFF_WHITE, self.side_panel, width=2, border_radius=PANEL_ROUNDED)
+        pygame.draw.rect(self.screen, OFF_WHITE, SIDE_PANEL, width=2, border_radius=PANEL_ROUNDED)
         
-        text_pos = (self.side_panel[0] + self.side_panel[2] // 2, self.side_panel[1] + self.side_panel[3] // 3)
+        text_pos = (SIDE_PANEL[0] + SIDE_PANEL[2] // 2, SIDE_PANEL[1] + SIDE_PANEL[3] // 3)
         display_text(self.screen, "Qubic", self.title_font, text_pos, width=text_area)
 
         text_pos = (text_pos[0], text_pos[1] + 45)
         display_text(self.screen, "Player 1: " + str(self.players[2]), self.regular_font, text_pos, width=text_area)
 
-        rect_pos = (text_pos[0] - rect_size // 2 + self.side_panel[2] // 3, text_pos[1] - rect_size // 2)
+        rect_pos = (text_pos[0] - rect_size // 2 + SIDE_PANEL[2] // 3, text_pos[1] - rect_size // 2)
 
         text_pos = (text_pos[0], text_pos[1] + 45)
         display_text(self.screen, "Player 2: " + str(self.players[0]), self.regular_font, text_pos, width=text_area)
@@ -219,16 +207,16 @@ def main():
             arena.draw_board(arena.board)
             arena.draw_side()
             text_surface = title_font.render(winner_text, True, WHITE, BLACK)
-            text_rect = text_surface.get_rect(center = (WIDTH // 2, HEIGHT // 3))
+            text_rect = text_surface.get_rect(center = (MAIN_PANEL[3] // 2, HEIGHT // 3))
             screen.blit(text_surface, text_rect)
 
-            if textButton(screen, btn_font, "Restart", ((WIDTH // 2 - 75, HEIGHT // 3 + 50)), BLACK, WHITE):
+            if textButton(screen, btn_font, "Restart", ((MAIN_PANEL[3] // 2 - 75, HEIGHT // 3 + 50)), BLACK, WHITE):
                 state = STATE_MENU
                 player1 = None
                 player2 = None
                 arena = None
             
-            if textButton(screen, btn_font, "Quit", ((WIDTH // 2 + 75, HEIGHT // 3 + 50)), BLACK, WHITE):
+            if textButton(screen, btn_font, "Quit", ((MAIN_PANEL[3] // 2 + 75, HEIGHT // 3 + 50)), BLACK, WHITE):
                 running = False
                 break
 

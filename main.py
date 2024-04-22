@@ -84,7 +84,7 @@ class Arena():
         self.draw_side()
 
         if(type(self.players[self.curr_player + 1]) == HumanPlayer):
-            move = self.draw_human_board(self.board)
+            move = self.draw_board(self.board)
             self.players[self.curr_player + 1].set_move(move)
         else:
             self.draw_ai_board(self.board)
@@ -118,6 +118,7 @@ class Arena():
         #     exit(1)
 
     def draw_board(self, board):
+        pygame.draw.rect(self.screen, OFF_WHITE, self.bottom_panel, width=2, border_radius=PANEL_ROUNDED)
         for rack in range(4):
             for row in range(4):
                 for col in range(4):
@@ -134,13 +135,8 @@ class Arena():
                             return 16 * rack + 4 * row + col
                     else:
                         createSquareButton(self.screen, pos_x, self.bottom_panel[1] + pos_y, BTN_SIZE, BTN_SIZE, disabled=True, disabled_color=color)
-    
-    def draw_human_board(self, board):
-        pygame.draw.rect(self.screen, OFF_WHITE, self.bottom_panel, width=2, border_radius=PANEL_ROUNDED)
-        return self.draw_board(board)
-    
+
     def draw_ai_board(self, board):
-        pygame.draw.rect(self.screen, OFF_WHITE, self.bottom_panel, width=2, border_radius=PANEL_ROUNDED)
         self.draw_board(board)
         
         if self.curr_player + 1 == 0:
@@ -178,7 +174,7 @@ class Arena():
 
 STATE_MENU = (1 << 0)
 STATE_PLAY = (1 << 1)
-STATE_END  = (1 << 3)
+STATE_END  = (1 << 2)
 
 def main():
     pygame.init()
@@ -192,6 +188,7 @@ def main():
     winner = None
     player1 = None
     player2 = None
+    arena = None
     title_font = pygame.font.Font(None, 75)
     btn_font = pygame.font.Font(None, 35)
 
@@ -201,54 +198,71 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
                 break
-        
+
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_e:
+                state = STATE_END
+                continue
+
+        screen.fill(BLACK)
         if state == STATE_MENU:
-            screen.fill(BLACK)
             center = [WIDTH // 2, HEIGHT // 3]
             display_text(screen, "QUBIC", title_font, center)
             center[1] += 100
             if textButton(screen, btn_font, "Human VS Human", center, BLACK, WHITE):
                 player1 = HumanPlayer(game)
                 player2 = HumanPlayer(game)
+                arena = Arena(screen, game, player1, player2)
                 state = STATE_PLAY
             
             center[1] += 50
             if textButton(screen, btn_font, "Human VS Mini Max", center, BLACK, WHITE):
                 player1 = HumanPlayer(game)
                 player2 = MiniMaxPlayer(game, 2, 2)
+                arena = Arena(screen, game, player1, player2)
                 state = STATE_PLAY
 
             center[1] += 50
             if textButton(screen, btn_font, "Human VS Alpha Beta", center, BLACK, WHITE):
                 player1 = HumanPlayer(game)
                 player2 = AlphaBetaPlayer(game, 2)
+                arena = Arena(screen, game, player1, player2)
                 state = STATE_PLAY
 
             center[1] += 50
             if textButton(screen, btn_font, "Mini Max VS Alpha Beta", center, BLACK, WHITE):
                 player1 = MiniMaxPlayer(game, 1, 2)
-                player2 = AlphaBetaPlayer(game, 2)
+                player2 = MiniMaxPlayer(game, 2, 2)
+                # player2 = AlphaBetaPlayer(game, 2)
+                arena = Arena(screen, game, player1, player2)
                 state = STATE_PLAY
 
         elif state == STATE_PLAY:
-            arena = Arena(screen, game, player1, player2)
-            winner = arena.play_game()
-            state = STATE_END
-
+            if game.getGameEnded(arena.board, arena.curr_player) != 0:
+                state = STATE_END
+            arena.draw()
+            arena.update()
+            
         elif state == STATE_END:
             winner_text = "It is a Draw!"
-            if winner == 1:
-                # print("Player 2 won!")
-                winner_text = "Player 2 won!"
-            elif winner == -1:
-                # print("Player 1 won!")
-                winner_text = "Player 1 won!"
+            if winner == 1:     winner_text = "Player 2 won!"
+            elif winner == -1:  winner_text = "Player 1 won!"
 
-            print(winner_text)
-            # text_surface = title_font.render(winner_text, True, WHITE, BLACK)
-            # text_rect = text_surface.get_rect(center = (WIDTH // 2, HEIGHT // 2))
-            # screen.blit(text_surface, text_rect)
-        
+            arena.draw_board(arena.board)
+            arena.draw_side()
+            text_surface = title_font.render(winner_text, True, WHITE, BLACK)
+            text_rect = text_surface.get_rect(center = (WIDTH // 2, HEIGHT // 3))
+            screen.blit(text_surface, text_rect)
+
+            if textButton(screen, btn_font, "Restart", ((WIDTH // 2 - 75, HEIGHT // 3 + 50)), BLACK, WHITE):
+                state = STATE_MENU
+                player1 = None
+                player2 = None
+                arena = None
+            
+            if textButton(screen, btn_font, "Quit", ((WIDTH // 2 + 75, HEIGHT // 3 + 50)), BLACK, WHITE):
+                running = False
+                break
+
         pygame.display.update()
     
     pygame.quit()

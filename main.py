@@ -214,7 +214,7 @@ def main():
                 running = False
                 break
 
-        py_clock.clock.tick(FPS)
+        py_clock.tick(FPS)
         pygame.display.update()
 
     pygame.quit()

@@ -1,6 +1,6 @@
 import pygame
 
-from GUI.constants import *
+from GUI.constants import OFF_WHITE, DARK_GREY, GREY
 BTN_COL = OFF_WHITE
 BTN_H_COL = DARK_GREY
 

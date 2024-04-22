@@ -167,7 +167,7 @@ def main():
             center[1] += 50
             if textButton(screen, btn_font, "Human VS Mini Max", center, BLACK, WHITE):
                 player1 = HumanPlayer(game)
-                player2 = MiniMaxPlayer(game, 2, 2)
+                player2 = MiniMaxPlayer(game, 2)
                 arena = Arena(screen, game, player1, player2)
                 state = STATE_PLAY
 
@@ -180,9 +180,8 @@ def main():
 
             center[1] += 50
             if textButton(screen, btn_font, "Mini Max VS Alpha Beta", center, BLACK, WHITE):
-                player1 = MiniMaxPlayer(game, 1, 2)
-                player2 = MiniMaxPlayer(game, 2, 2)
-                # player2 = AlphaBetaPlayer(game, 2)
+                player1 = MiniMaxPlayer(game, 2)
+                player2 = AlphaBetaPlayer(game, 2)
                 arena = Arena(screen, game, player1, player2)
                 state = STATE_PLAY
         elif state == STATE_PLAY:

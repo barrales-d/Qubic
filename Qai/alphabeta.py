@@ -11,9 +11,11 @@ class AlphaBetaPlayer(Player):
         self.move = None
         self.max_depth = max_depth
 
-    def __str__(self) -> str: return "Alpha Beta"
+    def __str__(self) -> str:
+        return "Alpha Beta"
 
     def play(self, board) -> int | None:
+        self.move = None
         self.minimax(board, True, 0, -inf, inf)
         return self.move
 
@@ -27,55 +29,26 @@ class AlphaBetaPlayer(Player):
             return depth - 10
         else:
             return 0
-    
-    def eval_board(self, board, max_turn) -> int:
+
+    def eval_board(self, board, max_turn):
         # filter out all completely empty lines i.e: [0, 0, 0, 0]
         state = [list(line) for line in self.returnStreaks(board) if sum(line) != 0]
 
         streaks = []
         blocks = []
-        if max_turn:
-            # [1,0,0,0] || [1,1,0,0] || [1,1,1,0] || [1,1,1,1]
-            streaks = [sum(line) for line in state if sum(line) <= 4]
-            # [255,255,255,1]
-            blocks = [1 for line in state if sum(line) == 766 and line.count(255) == 3]
-        else:
-            # [255,0,0,0] || [255,255,0,0] || [255,255,255,0] || [255,255,255,255]
-            streaks = [line.count(255) for line in state if sum(line) % 255 == 0]
-            # [1,1,1,255]
-            blocks = [1 for line in state if sum(line) == 766 and line.count(1) == 3]
-
+        # [1,0,0,0] || [1,1,0,0] || [1,1,1,0] || [1,1,1,1]
+        streaks = [sum(line) for line in state if sum(line) <= 4]
+        # [255,255,255,1]
+        blocks = [1 for line in state if sum(line) == 766 and line.count(255) == 3]
 
         streak_score = self.attributes['in-a-row'] * len(streaks) + self.attributes['per-streak'] * sum(streaks)
         block_score = self.attributes['total-block'] * len(blocks)
-        return int(streak_score + block_score)
-        streaks = self.returnStreaks(board)
-        points_max = 0
-        points_min = 0
-        for streak in streaks:
-            streak_sum = sum(streak)
 
-            if streak_sum < 4:
-                points_max += streak_sum if max_turn else int(streak_sum / 2)
-
-            if streak_sum > 510:
-                points_min += 1
-            elif streak_sum > 255:
-                points_min += 2
-            elif streak_sum > 200:
-                points_min += 3
-
-        num1 = randint(-10, 10)
-        num2 = randint(-10, 10)
-        scale = 0
         if max_turn:
-            scale = max(num1, num2)
-            return (scale * points_max) - (10 * points_min)
+            return int(streak_score + block_score)
         else:
-            scale = min(num1, num2)
-            return (scale * points_min) - (10 * points_max)
+            return int(streak_score - block_score)
 
-    
     def minimax(self, board, max_turn, depth, alpha, beta) -> int:
         player = -1 if max_turn else 1
         if self.game.getGameEnded(board, player) != 0:
@@ -89,12 +62,9 @@ class AlphaBetaPlayer(Player):
         moves = []
 
         empty_cells = [i for (i, valid) in enumerate(self.game.getValidMoves(board, 1)) if valid]
-
-        # best_score = -inf if max_turn else inf
-        # best_idx = 0
-        for idx, move in enumerate(empty_cells):
+        for move in empty_cells:
             curr_board, _ = self.game.getNextState(board, player, move)
-            curr_score = self.minimax(curr_board, (not max_turn), depth, alpha, beta)
+            curr_score = self.minimax(self.game.getCanonicalForm(curr_board, player), (not max_turn), depth, alpha, beta)
             scores.append(curr_score)
             moves.append(move)
 

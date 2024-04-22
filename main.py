@@ -20,7 +20,6 @@ class Arena():
 
         self.players = [player2, None, player1]
         self.screen = screen
-        self.running = True
 
         self.title_font = pygame.font.Font(None, 50)
         self.regular_font = pygame.font.Font(None, 25)
@@ -54,10 +53,7 @@ class Arena():
         action = self.players[self.curr_player + 1].play(canonical_board)
         if action == None: return
 
-        if action == -1:
-            self.running == False
-            return
-        valid_moves = [i for (i, valid) in enumerate(self.game.getValidMoves(canonical_board, self.curr_player)) if valid]
+        valid_moves = [i for (i, valid) in enumerate(self.game.getValidMoves(canonical_board, 1)) if valid]
         if action in valid_moves:
             self.board, self.curr_player = self.game.getNextState(self.board, self.curr_player, action)
         else:
@@ -155,6 +151,7 @@ def main():
                 continue
 
         screen.fill(BLACK)
+
         if state == STATE_MENU:
             center = [WIDTH // 2, HEIGHT // 3]
             pygame.draw.rect(screen, OFF_WHITE, (center[0] - 200, center[1] - 100, 400, 400), width=BORDER_WIDTH, border_radius=PANEL_ROUNDED)
@@ -166,7 +163,7 @@ def main():
                 player2 = HumanPlayer(game)
                 arena = Arena(screen, game, player1, player2)
                 state = STATE_PLAY
-            
+
             center[1] += 50
             if textButton(screen, btn_font, "Human VS Mini Max", center, BLACK, WHITE):
                 player1 = HumanPlayer(game)
@@ -188,18 +185,23 @@ def main():
                 # player2 = AlphaBetaPlayer(game, 2)
                 arena = Arena(screen, game, player1, player2)
                 state = STATE_PLAY
-
         elif state == STATE_PLAY:
-            winner = game.getGameEnded(arena.board, arena.curr_player)
+            winner = game.getGameEnded(game.getCanonicalForm(arena.board, 1), 1)
             if winner != 0:
                 state = STATE_END
+                continue
+
+            winner = game.getGameEnded(game.getCanonicalForm(arena.board, -1), -1)
+            if winner != 0:
+                state = STATE_END
+                continue
+
             arena.draw()
             arena.update()
-            
         elif state == STATE_END:
             winner_text = "It is a Draw!"
-            if winner == 1:     winner_text = "Player 2 won!"
-            elif winner == -1:  winner_text = "Player 1 won!"
+            if winner == 1:     winner_text = "Player 1 won!"
+            elif winner == -1:  winner_text = "Player 2 won!"
 
             arena.draw_board(arena.board)
             arena.draw_side()

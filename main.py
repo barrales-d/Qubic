@@ -44,37 +44,6 @@ class Arena():
         self.animator.add('red', 100, 1, 4)
         self.animator.add('blue', 100, 5, 8)
 
-    def play_game(self):
-        while self.running:
-            if self.game.getGameEnded(self.board, self.curr_player) != 0:
-                self.running = False
-                break
-
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    self.running = False
-                    break
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_SPACE:
-                        print("="*30)
-                        print(self.players[self.curr_player + 1].returnStreaks(self.board))
-            # draw
-            self.draw()
-            # update
-            self.update()
-        
-        return self.game.getGameEnded(self.board, self.curr_player)
-        # self.running = True
-        # while self.running:
-        #     for event in pygame.event.get():
-        #         if event.type == pygame.QUIT:
-        #             self.running = False
-        #             break
-        #     self.draw()
-        # return self.game.getGameEnded(self.board, self.curr_player)
-
-        # pygame.quit()
-    
     def draw(self):
         self.screen.fill(BLACK)
         pygame.draw.rect(self.screen, OFF_WHITE, self.main_panel, border_radius=PANEL_ROUNDED)

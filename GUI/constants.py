@@ -30,6 +30,6 @@ BOTTOM_PANEL = (GPAD, GPAD + HEIGHT - BP_HEIGHT, WIDTH - GPAD*2, BP_HEIGHT - GPA
 PANEL_ROUNDED = 25
 
 def display_text(screen, text, font, pos, width=0):
-        text_surface = font.render(text, True, WHITE, wraplength=width)
-        text_rect = text_surface.get_rect(center = pos)
-        screen.blit(text_surface, text_rect)
+    text_surface = font.render(text, True, WHITE, wraplength=width)
+    text_rect = text_surface.get_rect(center = pos)
+    screen.blit(text_surface, text_rect)

@@ -1,13 +1,10 @@
-import random
 import pygame
-import os
 
-from GUI.animator import Animator
-from GUI.buttons import *
 from GUI.constants import *
+from GUI.buttons import *
+from GUI.animator import Animator
 from GUI.isometric import drawISOCubeGrid
 
-# from Qai.human_player import HumanPlayer
 from Qai.player import HumanPlayer
 from Qai.minimax import MiniMaxPlayer
 from Qai.alphabeta import AlphaBetaPlayer
@@ -20,9 +17,8 @@ class Arena():
         self.game = game
         self.curr_player = 1
         self.board = self.game.getInitBoard()
-        
+
         self.players = [player2, None, player1]
-        self.clock = pygame.time.Clock()
         self.screen = screen
         self.running = True
 
@@ -47,12 +43,11 @@ class Arena():
         else:
             self.draw_ai_board(self.board)
 
-        self.clock.tick(FPS)
         # Update is called in the middle of game loop because AI.play runs until completion
         # So if it was a the bottom, the screen wouldn't update until after the AI algorithms complete
         # This way, the AI.draw() gets shown at least once before the game freezes
         pygame.display.update()
-    
+
     def update(self):
         self.animator.update()
         canonical_board = self.game.getCanonicalForm(self.board, self.curr_player)
@@ -71,9 +66,6 @@ class Arena():
             col = int((action % 16) % 4)
             print("ERROR: Trying to place piece at:", f'({rack}, {row}, {col})')
             self.players[self.curr_player].max_depth += 1
-        #     print(self.curr_player)
-        #     print(self.board)
-        #     exit(1)
 
     def draw_board(self, board):
         pygame.draw.rect(self.screen, OFF_WHITE, BOTTOM_PANEL, width=2, border_radius=PANEL_ROUNDED)
@@ -96,20 +88,20 @@ class Arena():
 
     def draw_ai_board(self, board):
         self.draw_board(board)
-        
+
         if self.curr_player + 1 == 0:
             self.animator.play('blue')
         else:
             self.animator.play('red')
 
         self.animator.draw(self.screen)
-    
+
     def draw_side(self):
         text_area = SIDE_PANEL[2] - GPAD * 2
         rect_size = GPAD * 2
 
         pygame.draw.rect(self.screen, OFF_WHITE, SIDE_PANEL, width=2, border_radius=PANEL_ROUNDED)
-        
+
         text_pos = (SIDE_PANEL[0] + SIDE_PANEL[2] // 2, SIDE_PANEL[1] + SIDE_PANEL[3] // 3)
         display_text(self.screen, "Qubic", self.title_font, text_pos, width=text_area)
 
@@ -122,9 +114,9 @@ class Arena():
         display_text(self.screen, "Player 2: " + str(self.players[0]), self.regular_font, text_pos, width=text_area)
 
         pygame.draw.rect(self.screen, RED, (rect_pos[0], rect_pos[1], rect_size, rect_size), border_radius=BTN_ROUNDED*2)
-        
+
         rect_pos = (rect_pos[0], rect_pos[1] + 45)
-        
+
         pygame.draw.rect(self.screen, BLUE, (rect_pos[0], rect_pos[1], rect_size, rect_size), border_radius=BTN_ROUNDED*2)
 
 
@@ -139,6 +131,7 @@ def main():
     screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.SCALED)
     pygame.display.set_caption("Qubic")
     game = QubicGame(4, 4, 4)
+    py_clock = pygame.time.Clock()
 
     running = True
     state = STATE_MENU
@@ -146,6 +139,7 @@ def main():
     player1 = None
     player2 = None
     arena = None
+
     title_font = pygame.font.Font(None, 75)
     btn_font = pygame.font.Font(None, 35)
 
@@ -215,13 +209,14 @@ def main():
                 player1 = None
                 player2 = None
                 arena = None
-            
+
             if textButton(screen, btn_font, "Quit", ((MAIN_PANEL[3] // 2 + 75, HEIGHT // 3 + 50)), BLACK, WHITE):
                 running = False
                 break
 
+        py_clock.clock.tick(FPS)
         pygame.display.update()
-    
+
     pygame.quit()
 
 if __name__ == "__main__":

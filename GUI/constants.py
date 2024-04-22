@@ -15,6 +15,7 @@ WIDTH = 640
 HEIGHT = 640
 # global padding
 GPAD = 10
+BORDER_WIDTH = 2
 
 BP_HEIGHT = 125
 SP_WIDTH  = 150

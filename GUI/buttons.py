@@ -1,16 +1,16 @@
 import pygame
 
-from GUI.constants import OFF_WHITE, DARK_GREY, GREY
+from GUI.constants import OFF_WHITE, DARK_GREY, GREY, BORDER_WIDTH
 BTN_COL = OFF_WHITE
 BTN_H_COL = DARK_GREY
 
 MOUSE_BTN_1 = 0
-BTN_ROUNDED = 2
+BTN_ROUNDED = 50
 BTN_SIZE = 24
 BTN_SPACING = 2
 
-def createSquareButton(screen, x, y, w, h, disabled=False, disabled_color=GREY):
-    btn_rect = pygame.rect.Rect((x, y, w, h))
+def smallButton(screen, x, y, disabled=False, disabled_color=GREY):
+    btn_rect = pygame.rect.Rect((x, y, BTN_SIZE, BTN_SIZE))
     mouse_pos = pygame.mouse.get_pos()
     hovered = btn_rect.collidepoint(mouse_pos)
     btn_color = BTN_COL
@@ -44,7 +44,7 @@ def textButton(screen, font, text, pos, btn_color=BTN_COL, btn_outline=BTN_H_COL
         text_surface = font.render(text, True, btn_outline)
 
     pygame.draw.rect(screen, btn_color, btn_rect, border_radius=BTN_ROUNDED)
-    pygame.draw.rect(screen, btn_outline, btn_rect, BTN_SPACING, border_radius=BTN_ROUNDED)
+    pygame.draw.rect(screen, btn_outline, btn_rect, width=BORDER_WIDTH, border_radius=BTN_ROUNDED)
     screen.blit(text_surface, text_rect)
 
     if(pygame.mouse.get_pressed()[MOUSE_BTN_1]):

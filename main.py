@@ -68,7 +68,7 @@ class Arena():
             self.players[self.curr_player].max_depth += 1
 
     def draw_board(self, board):
-        pygame.draw.rect(self.screen, OFF_WHITE, BOTTOM_PANEL, width=2, border_radius=PANEL_ROUNDED)
+        pygame.draw.rect(self.screen, OFF_WHITE, BOTTOM_PANEL, width=BORDER_WIDTH, border_radius=PANEL_ROUNDED)
         for rack in range(4):
             for row in range(4):
                 for col in range(4):
@@ -81,10 +81,10 @@ class Arena():
                     if cell == -1: color = BLUE
 
                     if cell == 0:
-                        if createSquareButton(self.screen, pos_x, BOTTOM_PANEL[1] + pos_y, BTN_SIZE, BTN_SIZE):
+                        if smallButton(self.screen, pos_x, BOTTOM_PANEL[1] + pos_y):
                             return 16 * rack + 4 * row + col
                     else:
-                        createSquareButton(self.screen, pos_x, BOTTOM_PANEL[1] + pos_y, BTN_SIZE, BTN_SIZE, disabled=True, disabled_color=color)
+                        smallButton(self.screen, pos_x, BOTTOM_PANEL[1] + pos_y, disabled=True, disabled_color=color)
 
     def draw_ai_board(self, board):
         self.draw_board(board)
@@ -100,7 +100,7 @@ class Arena():
         text_area = SIDE_PANEL[2] - GPAD * 2
         rect_size = GPAD * 2
 
-        pygame.draw.rect(self.screen, OFF_WHITE, SIDE_PANEL, width=2, border_radius=PANEL_ROUNDED)
+        pygame.draw.rect(self.screen, OFF_WHITE, SIDE_PANEL, width=BORDER_WIDTH, border_radius=PANEL_ROUNDED)
 
         text_pos = (SIDE_PANEL[0] + SIDE_PANEL[2] // 2, SIDE_PANEL[1] + SIDE_PANEL[3] // 3)
         display_text(self.screen, "Qubic", self.title_font, text_pos, width=text_area)
@@ -157,6 +157,8 @@ def main():
         screen.fill(BLACK)
         if state == STATE_MENU:
             center = [WIDTH // 2, HEIGHT // 3]
+            pygame.draw.rect(screen, OFF_WHITE, (center[0] - 200, center[1] - 100, 400, 400), width=BORDER_WIDTH, border_radius=PANEL_ROUNDED)
+
             display_text(screen, "QUBIC", title_font, center)
             center[1] += 100
             if textButton(screen, btn_font, "Human VS Human", center, BLACK, WHITE):
@@ -188,7 +190,8 @@ def main():
                 state = STATE_PLAY
 
         elif state == STATE_PLAY:
-            if game.getGameEnded(arena.board, arena.curr_player) != 0:
+            winner = game.getGameEnded(arena.board, arena.curr_player)
+            if winner != 0:
                 state = STATE_END
             arena.draw()
             arena.update()
@@ -200,6 +203,8 @@ def main():
 
             arena.draw_board(arena.board)
             arena.draw_side()
+            pygame.draw.rect(screen, OFF_WHITE, MAIN_PANEL, width=BORDER_WIDTH, border_radius=PANEL_ROUNDED)
+
             text_surface = title_font.render(winner_text, True, WHITE, BLACK)
             text_rect = text_surface.get_rect(center = (MAIN_PANEL[3] // 2, HEIGHT // 3))
             screen.blit(text_surface, text_rect)

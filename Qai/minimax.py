@@ -7,10 +7,11 @@ from GUI.buttons import *
 from Qai.player import Player
 
 class MiniMaxPlayer(Player):
-    def __init__(self, game, max_depth=10):
+    def __init__(self, game, vs_ai, max_depth=10):
         super().__init__(game)
         self.move = None
         self.max_depth = max_depth
+        self.vs_ai = vs_ai
 
     def __str__(self) -> str:
         return "Mini Max"
@@ -65,8 +66,11 @@ class MiniMaxPlayer(Player):
 
         empty_cells = [i for (i, valid) in enumerate(self.game.getValidMoves(self.game.getCanonicalForm(board, player), 1)) if valid]
         for move in empty_cells:
-            curr_board, _ = self.game.getNextState(board, player, move)
-            curr_score = self.minimax(self.game.getCanonicalForm(curr_board, player), (not max_turn), depth)
+            curr_board, _ = self.game.getNextState(self.game.getCanonicalForm(board, player), player, move)
+            if self.vs_ai:
+                curr_score = self.minimax(self.game.getCanonicalForm(curr_board, player), (not max_turn), depth)
+            else:
+                curr_score = self.minimax(curr_board, (not max_turn), depth)
             scores.append(curr_score)
             moves.append(move)
 

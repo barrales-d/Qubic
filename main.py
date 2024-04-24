@@ -1,3 +1,4 @@
+import numpy as np
 import pygame
 
 from GUI.constants import *
@@ -10,6 +11,7 @@ from Qai.minimax import MiniMaxPlayer
 from Qai.alphabeta import AlphaBetaPlayer
 
 from GameLogic.qubic import QubicGame
+from Qai.streaks import return_streak_indicies, returnStreaks
 
 
 class Arena():
@@ -62,6 +64,24 @@ class Arena():
             col = int((action % 16) % 4)
             print("ERROR: Trying to place piece at:", f'({rack}, {row}, {col})')
             self.players[self.curr_player].max_depth += 1
+
+    def get_winning_streak(self):
+        streaks = returnStreaks(self.board)
+        streak_indicies = return_streak_indicies(self.board)
+        for idx, streak in enumerate(streaks):
+            if(np.unique(streak).size == 1):
+                for player in [255, 1]:
+                    if streak[0] == player:
+                        if player == 255: player = -1
+
+                        return player, list(streak_indicies[idx])
+        # draw
+        if not self.game.getValidMoves(self.board, self.curr_player).any():
+            return None, None
+
+        # Game is not ended yet.
+        return 0, None
+
 
     def draw_board(self, board):
         pygame.draw.rect(self.screen, OFF_WHITE, BOTTOM_PANEL, width=BORDER_WIDTH, border_radius=PANEL_ROUNDED)
@@ -174,7 +194,7 @@ def main():
             center[1] += 50
             if textButton(screen, btn_font, "Human VS Alpha Beta", center, BLACK, WHITE):
                 player1 = HumanPlayer(game)
-                player2 = AlphaBetaPlayer(game, False, 3)
+                player2 = AlphaBetaPlayer(game, False, 2)
                 arena = Arena(screen, game, player1, player2)
                 state = STATE_PLAY
 
@@ -185,26 +205,44 @@ def main():
                 arena = Arena(screen, game, player1, player2)
                 state = STATE_PLAY
         elif state == STATE_PLAY:
-            winner = game.getGameEnded(game.getCanonicalForm(arena.board, 1), 1)
-            if winner != 0:
-                state = STATE_END
-                continue
 
-            winner = game.getGameEnded(game.getCanonicalForm(arena.board, -1), -1)
-            if winner != 0:
+            # winner, _ = arena.get_winning_streak()
+            if arena.get_winning_streak()[0] != 0:
                 state = STATE_END
                 continue
+            # winner = game.getGameEnded(game.getCanonicalForm(arena.board, 1), 1)
+            # if winner != 0:
+            #     state = STATE_END
+            #     continue
+
+            # winner = game.getGameEnded(game.getCanonicalForm(arena.board, -1), -1)
+            # if winner != 0:
+            #     state = STATE_END
+            #     continue
 
             arena.draw()
             arena.update()
         elif state == STATE_END:
+            winner, winning_streak = arena.get_winning_streak()
             winner_text = "It is a Draw!"
             if winner == 1:     winner_text = "Player 1 won!"
             elif winner == -1:  winner_text = "Player 2 won!"
 
             arena.draw_board(arena.board)
+
+            if winning_streak != None:
+                for cell in winning_streak:
+                    rack, row, col = cell
+                    pos_x = (BTN_SIZE + BTN_SPACING)*col + BTN_SPACING + (BTN_SIZE*6*rack) + BOTTOM_PANEL[0]*6
+                    pos_y = (BTN_SIZE + BTN_SPACING)*row + BTN_SPACING + 5
+                    smallButton(screen, pos_x, BOTTOM_PANEL[1] + pos_y, disabled=True, disabled_color=GREEN)
+
+
             arena.draw_side()
             pygame.draw.rect(screen, OFF_WHITE, MAIN_PANEL, width=BORDER_WIDTH, border_radius=PANEL_ROUNDED)
+
+            # print(arena.get_winning_streak())
+            # exit(0)
 
             text_surface = title_font.render(winner_text, True, WHITE, BLACK)
             text_rect = text_surface.get_rect(center = (MAIN_PANEL[3] // 2, HEIGHT // 3))

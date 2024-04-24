@@ -4,6 +4,7 @@ from GUI.constants import *
 from GUI.buttons import *
 
 from Qai.player import Player
+from Qai.streaks import returnStreaks
 
 class AlphaBetaPlayer(Player):
     def __init__(self, game, vs_ai, max_depth=10):
@@ -33,7 +34,7 @@ class AlphaBetaPlayer(Player):
 
     def eval_board(self, board, max_turn):
         # filter out all completely empty lines i.e: [0, 0, 0, 0]
-        state = [list(line) for line in self.returnStreaks(board) if sum(line) != 0]
+        state = [list(line) for line in returnStreaks(board) if sum(line) != 0]
 
         streaks = []
         blocks = []

@@ -79,20 +79,9 @@ def main():
                 arena = Arena(screen, game, player1, player2)
                 state = STATE_PLAY
         elif state == STATE_PLAY:
-
-            # winner, _ = arena.get_winning_streak()
             if arena.get_winning_streak()[0] != 0:
                 state = STATE_END
                 continue
-            # winner = game.getGameEnded(game.getCanonicalForm(arena.board, 1), 1)
-            # if winner != 0:
-            #     state = STATE_END
-            #     continue
-
-            # winner = game.getGameEnded(game.getCanonicalForm(arena.board, -1), -1)
-            # if winner != 0:
-            #     state = STATE_END
-            #     continue
 
             arena.draw()
             arena.update()
@@ -111,12 +100,8 @@ def main():
                     pos_y = (BTN_SIZE + BTN_SPACING)*row + BTN_SPACING + 5
                     smallButton(screen, pos_x, BOTTOM_PANEL[1] + pos_y, disabled=True, disabled_color=GREEN)
 
-
             arena.draw_side()
             pygame.draw.rect(screen, OFF_WHITE, MAIN_PANEL, width=BORDER_WIDTH, border_radius=PANEL_ROUNDED)
-
-            # print(arena.get_winning_streak())
-            # exit(0)
 
             text_surface = title_font.render(winner_text, True, WHITE, BLACK)
             text_rect = text_surface.get_rect(center = (MAIN_PANEL[3] // 2, HEIGHT // 3))

@@ -22,6 +22,12 @@
     ```console
     (venv)$  python3 main.py
     ```
+## Data
+`time_depth.csv`: is the amount of time in seconds that each AI algorithms takes to complete one turn depending on the max_depth set during that run.
+
+`games_played##.csv`: is the results of 10 games where the first number indicates the max_depth of the Minimax algorithm and the second number indicates the max_depth of the Alpha Beta algorithm. 
+    
+For example: games_played12.csv: is the result when Minimax had a max_depth of 1 and Alpha Beta had a max_depth of 2
 
 # Problem Statement
 Qubic is a 3D tic-tac-toe variant in which two players take turns to place pieces on a 4x4x4 cube board consisting of 64 cells. The goal is to get four pieces lined up in a row. I will implement a competitive AI agent that humans can play against. In addition, I want to visualize the agent's thinking process through a simple graphical user interface that humans can use to play the game.

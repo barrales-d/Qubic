@@ -1,4 +1,3 @@
-from random import randint
 from math import inf
 from GUI.constants import *
 from GUI.buttons import *

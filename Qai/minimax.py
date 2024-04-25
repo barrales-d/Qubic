@@ -1,6 +1,3 @@
-from random import randint
-from math import inf
-import time
 from GUI.constants import *
 from GUI.buttons import *
 

@@ -1,6 +1,5 @@
 import numpy as np
 
-
 # Copied from GameLogic.board
 def returnStreaks(board):
     streak = np.zeros((76, 4), dtype=np.uint8)

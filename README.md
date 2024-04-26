@@ -29,6 +29,8 @@
     
 For example: games_played12.csv: is the result when Minimax had a max_depth of 1 and Alpha Beta had a max_depth of 2
 
+`games_played.csv`: is results of who won after I played against the AI 44 times.
+
 # Problem Statement
 Qubic is a 3D tic-tac-toe variant in which two players take turns to place pieces on a 4x4x4 cube board consisting of 64 cells. The goal is to get four pieces lined up in a row. I will implement a competitive AI agent that humans can play against. In addition, I want to visualize the agent's thinking process through a simple graphical user interface that humans can use to play the game.
 

@@ -23,3 +23,9 @@ def game_won_file(csv_file_name: str, mm_win_count, ab_win_count, draw_count) ->
         writer = csv.writer(csvfile)
         writer.writerow(['Minimax won', 'Alpha Beta won', 'Draws'])
         writer.writerow([mm_win_count, ab_win_count, draw_count])
+
+
+def mark_winner(csv_file_name: str, h_won, mm_won, ab_won, draw) -> None:
+    with open(csv_file_name + '.csv', 'a', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow([h_won, mm_won, ab_won, draw])
